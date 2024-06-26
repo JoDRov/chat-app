@@ -50,6 +50,26 @@ io.on('connection', (socket) => {
 		console.log('message: ' + msg);
 		io.emit('chat message', msg);
 	});
+
+	socket.on('register', async (userInfo) => {
+		console.log(userInfo);
+		try {
+			const newUser = new User({
+				name: userInfo.name,
+				password: userInfo.password
+			});
+			await newUser.save();
+			socket.emit('register', {
+				success: true,
+				message: 'User registered succesfully'
+			});
+		} catch (error) {
+			socket.emit('register', {
+				success: false,
+				message: 'User registration failed'
+			});
+		}
+	});
 });
 
 server.listen(PORT, () => {

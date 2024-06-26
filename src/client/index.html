@@ -17,17 +17,43 @@
 		<header>
 			<h1>WHATSAPP 2</h1>
 		</header>
-		<div id="register">
+		<form id="register">
 			<h3>Register</h3>
-			<input type="text" placeholder="Username" />
-			<input type="text" placeholder="Password" />
+			<input id="regUsername" type="text" placeholder="Username" />
+			<input id="regPassword" type="text" placeholder="Password" />
 			<button id="regsubmit" type="submit">Submit</button>
-		</div>
-		<div id="login">
+		</form>
+		<form id="login">
 			<h3>Login</h3>
 			<input type="text" placeholder="Username" />
 			<input type="text" placeholder="Password" />
 			<button id="logsubmit" type="submit">Submit</button>
-		</div>
+		</form>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			const socket = io();
+
+			const register = document.getElementById('register');
+			const login = document.getElementById('login');
+			const regUsername = document.getElementById('regUsername');
+			const regPassword = document.getElementById('regPassword');
+
+			register.addEventListener('submit', (event) => {
+				userInfo.preventDefault();
+
+				const userInfo = {
+					name: regUsername.value,
+					password: regPassword.value
+				};
+
+				socket.emit('register', userInfo);
+				regUsername.value = '';
+				regPassword.value = '';
+			});
+
+			socket.on('register', (userInfo) => {
+				console.log(userInfo);
+			});
+		</script>
 	</body>
 </html>
