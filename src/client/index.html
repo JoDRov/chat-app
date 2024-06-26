@@ -23,6 +23,7 @@
 			<input id="regPassword" type="text" placeholder="Password" />
 			<button id="regsubmit" type="submit">Submit</button>
 		</form>
+		<div id="registerResult"></div>
 		<form id="login">
 			<h3>Login</h3>
 			<input type="text" placeholder="Username" />
@@ -37,9 +38,10 @@
 			const login = document.getElementById('login');
 			const regUsername = document.getElementById('regUsername');
 			const regPassword = document.getElementById('regPassword');
+			const registerResult = document.getElementById('registerResult');
 
 			register.addEventListener('submit', (event) => {
-				userInfo.preventDefault();
+				event.preventDefault();
 
 				const userInfo = {
 					name: regUsername.value,
@@ -51,8 +53,9 @@
 				regPassword.value = '';
 			});
 
-			socket.on('register', (userInfo) => {
-				console.log(userInfo);
+			socket.on('register', (response) => {
+				console.log(response.message);
+				registerResult.textContent = response.message;
 			});
 		</script>
 	</body>
