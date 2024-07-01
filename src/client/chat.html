@@ -96,7 +96,6 @@
 	</style>
 	<body>
 		<section id="chat">
-			<div id="connectedUsers"></div>
 			<ul id="messages"></ul>
 			<form id="form">
 				<input
@@ -115,19 +114,35 @@
 
 			const form = document.getElementById('form');
 			const input = document.getElementById('input');
+			const messages = document.getElementById('messages');
+			const username = localStorage.getItem('username');
 
 			form.addEventListener('submit', (e) => {
 				e.preventDefault();
 
 				if (input.value) {
-					socket.emit('chat message', input.value);
+					const messageData = {
+						username: username,
+						message: input.value
+					};
+
+					socket.emit('chat message', messageData);
 					input.value = '';
 				}
 			});
 
+			socket.on('load messages', (msgs) => {
+				msgs.forEach((msg) => {
+					const item = document.createElement('li');
+					item.textContent = `${msg.name}: ${msg.message}`;
+					messages.appendChild(item);
+				});
+				window.scrollTo(0, document.body.scrollHeight);
+			});
+
 			socket.on('chat message', (msg) => {
 				const item = document.createElement('li');
-				item.textContent = msg;
+				item.textContent = `${msg.username}: ${msg.message}`;
 				messages.appendChild(item);
 				window.scrollTo(0, document.body.scrollHeight);
 			});

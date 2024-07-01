@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 
-const messages = new mongoose.Schema({
-	name: String,
-	message: String
+const messageSchema = new mongoose.Schema({
+	name: { type: String, required: true },
+	message: { type: String, required: true },
+	timestamp: { type: Date, default: Date.now }
 });
 
-export const Message: any = mongoose.model('Message', messages);
+export const Message: any = mongoose.model('Message', messageSchema);

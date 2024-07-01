@@ -20,15 +20,17 @@
 		<form id="register">
 			<h3>Register</h3>
 			<input id="regUsername" type="text" placeholder="Username" />
-			<input id="regPassword" type="text" placeholder="Password" />
+			<input id="regPassword" type="password" placeholder="Password" />
 			<button id="regsubmit" type="submit">Submit</button>
 		</form>
+		<div id="registerResult"></div>
 		<form id="login">
 			<h3>Login</h3>
-			<input type="text" placeholder="Username" />
-			<input type="text" placeholder="Password" />
+			<input id="loginUsername" type="text" placeholder="Username" />
+			<input id="loginPassword" type="password" placeholder="Password" />
 			<button id="logsubmit" type="submit">Submit</button>
 		</form>
+		<div id="loginResult"></div>
 		<script src="/socket.io/socket.io.js"></script>
 		<script>
 			const socket = io();
@@ -37,9 +39,13 @@
 			const login = document.getElementById('login');
 			const regUsername = document.getElementById('regUsername');
 			const regPassword = document.getElementById('regPassword');
+			const registerResult = document.getElementById('registerResult');
+			const loginUsername = document.getElementById('loginUsername');
+			const loginPassword = document.getElementById('loginPassword');
+			const loginResult = document.getElementById('loginResult');
 
 			register.addEventListener('submit', (event) => {
-				userInfo.preventDefault();
+				event.preventDefault();
 
 				const userInfo = {
 					name: regUsername.value,
@@ -51,8 +57,30 @@
 				regPassword.value = '';
 			});
 
-			socket.on('register', (userInfo) => {
-				console.log(userInfo);
+			socket.on('register', (response) => {
+				console.log(response.message);
+				registerResult.textContent = response.message;
+			});
+
+			login.addEventListener('submit', (event) => {
+				event.preventDefault();
+
+				const loginInfo = {
+					name: loginUsername.value,
+					password: loginPassword.value
+				};
+
+				socket.emit('login', loginInfo);
+			});
+
+			socket.on('login', (response) => {
+				console.log(response.message);
+				loginResult.textContent = response.message;
+
+				if (response.success) {
+					localStorage.setItem('username', response.username);
+					window.location.href = '/chat';
+				}
 			});
 		</script>
 	</body>

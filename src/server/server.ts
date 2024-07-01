@@ -9,9 +9,7 @@ import { Message } from '../models/messages.js';
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-	connectionStateRecovery: {}
-});
+const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -24,13 +22,6 @@ db.on('error', console.error.bind(console, 'connection error'));
 db.once('open', () => {
 	console.log('Connected to MongoDB');
 });
-/*
-Run();
-async function Run() {
-	const user = new User({ name: 'John', password: '1234' });
-	await user.save();
-	console.log(user);
-}*/
 
 app.get('/', (req: Request, res: Response) => {
 	res.sendFile(join(__dirname, '../../src/client/index.html'));
@@ -40,14 +31,26 @@ app.get('/chat', (req: Request, res: Response) => {
 	res.sendFile(join(__dirname, '../../src/client/chat.html'));
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
 	console.log('a user has connected');
+
+	const messages = await Message.find().sort({ timestamp: 1 }).lean();
+	socket.emit('load messages', messages);
+
 	socket.on('disconnect', () => {
 		console.log('a user has disconnected');
 	});
 
-	socket.on('chat message', (msg) => {
-		console.log('message: ' + msg);
+	socket.on('chat message', async (msg) => {
+		console.log(`${msg.username}: ${msg.message}`);
+
+		const message = new Message({
+			name: msg.username,
+			message: msg.message
+		});
+
+		await message.save();
+
 		io.emit('chat message', msg);
 	});
 
@@ -58,15 +61,51 @@ io.on('connection', (socket) => {
 				name: userInfo.name,
 				password: userInfo.password
 			});
-			await newUser.save();
-			socket.emit('register', {
-				success: true,
-				message: 'User registered succesfully'
-			});
+
+			const savedUser = await User.findOne({ name: userInfo.name });
+			if (!savedUser) {
+				await newUser.save();
+				socket.emit('register', {
+					success: true,
+					message: 'User registered succesfully'
+				});
+			} else {
+				socket.emit('register', {
+					success: false,
+					message: 'Username already in use'
+				});
+			}
 		} catch (error) {
 			socket.emit('register', {
 				success: false,
 				message: 'User registration failed'
+			});
+		}
+	});
+
+	socket.on('login', async (userInfo) => {
+		try {
+			const user = await User.findOne({
+				name: userInfo.name,
+				password: userInfo.password
+			});
+
+			if (user) {
+				socket.emit('login', {
+					success: true,
+					message: 'Login successful',
+					username: userInfo.name
+				});
+			} else {
+				socket.emit('login', {
+					success: false,
+					message: 'Invalid username'
+				});
+			}
+		} catch {
+			socket.emit('login', {
+				success: false,
+				message: 'Login failed'
 			});
 		}
 	});
