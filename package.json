@@ -4,7 +4,7 @@
 	"main": "server.js",
 	"type": "module",
 	"scripts": {
-		"dev": "node dist/server/server.js",
+		"chatapp": "node dist/server/server.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
