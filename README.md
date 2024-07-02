@@ -34,7 +34,7 @@ cd chat-app
 
 ## Install Dependencies
 
-npm install
+Use the command "npm install" or "npm i" to install all the dependencies needed for this project
 
 ## Compiling Typescript
 
@@ -50,11 +50,11 @@ Use the command "tsc" to compile all typescript files found on the src folder, i
 
 4. docker exec -it <container_id_or_name> bin/bash
 
-5. apt-get update // update all apt-get packages on the linux machine running on docker
+5. "apt-get update", update all apt-get packages on the linux machine running on docker
 
-6. apt-get install mongosh // install mongo shell on the linux machine running on docker
+6. "apt-get install" mongosh, install mongo shell on the linux machine running on docker
 
-7. mongosh -u root -p example // "-u" it's used for username and "-p" it's used for password, this way you can log into mongo's datgabase using mongosh
+7. "mongosh -u root -p example", "-u" it's used for username and "-p" it's used for password, this way you can log into mongo's datgabase using mongosh
 
 ## Run the application
 
